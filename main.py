@@ -3,6 +3,10 @@ import sys
 from data.data import fetch_ohlcv_data
 from utils.ema import ema
 from plot.plotting import plot_ema_and_prices
+from log.logger import setup_logger
+
+# Set up the logger
+logger = setup_logger()
 
 def main():
     try:
@@ -25,14 +29,21 @@ def main():
         limit = max(1, min(limit, 1000))
 
         # Fetch historical OHLCV data for the given symbol with the specified limit
+        logger.info(f"Fetching historical OHLCV data for {symbol}...")
         data = fetch_ohlcv_data(symbol, limit=limit)
+        logger.info(f"Data fetching completed for {symbol}.")
 
         # Calculate EMAs
+        logger.info("Calculating EMAs...")
         for length in ema_lengths:
             data[f'EMA_{length}'] = ema(data, length)
-
+        logger.info("EMA calculation completed.")
+        
+        # Plot EMAs and actual price
+        logger.info("Plotting EMAs and prices...")
         plot_ema_and_prices(data, ema_lengths, symbol, args.save_png, args.show_price)
-
+        logger.info("Plotting completed.")
+        
     except Exception as e:
         print(f"An error occurred: {e}")
         
